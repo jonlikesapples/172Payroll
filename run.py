@@ -35,7 +35,7 @@ def create():
 		last_name = request.args.get("lastname")
 		salary = request.args.get("salary")
 		if first_name is None or last_name is None or salary is None:
-			return "Something is left null!";
+			return "Something is left empty!";
 		response = table.put_item(
 			Item={
 				'userID' : str(uuid.uuid1()), #PRIMARY KEY
