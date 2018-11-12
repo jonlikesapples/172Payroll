@@ -47,9 +47,9 @@ class Login extends Component {
 
 render(){
     return (    
-        <div>
-        <div className="login_container" style ={{border:"1px solid #c2c2c2",width:"50%",margin:"auto"}}>
-        <form onSubmit={this.submitLogin}>
+        <div className="login_container" style={{margin:"25%"}}>
+        <div style ={{border:"1px solid #c2c2c2",textAlign: "center"}}>
+        <form onSubmit={this.submitLogin} style={{display: "inline-block"}}>
             <h2>Log in here</h2>
             <div className="form_element">
                 <input 
