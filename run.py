@@ -18,18 +18,18 @@ app = Flask(__name__)
 session = Session(
 	aws_access_key_id = Keys.AWS_ACCESS_KEY,
 	aws_secret_access_key = Keys.AWS_SECRET_KEY,
-	region_name = Keys.AWS_REGION
+	region_name = "us-east-2"
 )
 
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
 
-@app.route('/')
+@app.route('/api/')
 def hello_world():
 	return "hello world"
 
 
-@app.route('/create')
+@app.route('/api/create',methods=['GET', 'POST'])
 def create():
 		first_name = request.args.get("firstname")
 		last_name = request.args.get("lastname")
@@ -46,13 +46,24 @@ def create():
 		)
 		return (jsonify(response));
 
-@app.route('/query')
+@app.route('/api/query')
 def query():
 	response = table.query( #doesnt work properly
 		KeyConditionExpression=Key('Salary').eq(100000)
 	)
 
 	return (jsonify(response['Items']))
+
+@app.route('/api/login',methods=['GET', 'POST'])
+def login():
+	username = request.args.get("username")
+	password = request.args.get("password")
+	print(username)
+	print(password)
+	response = {
+		'code' : 200
+	}
+	return (jsonify(response));
 
 if __name__ == '__main__':
 	app.debug = True

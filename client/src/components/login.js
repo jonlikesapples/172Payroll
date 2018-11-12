@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 class Login extends Component {
 
@@ -28,6 +29,13 @@ class Login extends Component {
 
     submitLogin = (e) =>{
         e.preventDefault();
+        let username = this.state.username;
+        let password = this.state.password
+        axios.post(`/api/login?username=${username}&password=${password}`)
+            .then(res=>{   
+                console.log(res.data)
+            })
+
     }
 
     updateForm = (newState) =>{
@@ -38,8 +46,9 @@ class Login extends Component {
     
 
 render(){
-    return (
-        <div className="login_container" style ={{marginLeft:"25%",marginRight:'25%',alignItems: 'center',border:"1px solid #c2c2c2"}}>
+    return (    
+        <div>
+        <div className="login_container" style ={{border:"1px solid #c2c2c2",width:"50%",margin:"auto"}}>
         <form onSubmit={this.submitLogin}>
             <h2>Log in here</h2>
             <div className="form_element">
@@ -60,6 +69,7 @@ render(){
             </div>
             <button type="submit">Log in</button>
             </form>
+            </div>
             </div>
     );
 }   
