@@ -16,15 +16,8 @@ class Create extends Component {
 
     
     ////////////////Login ////////////////////
-    handleInputFirstname = (event) => {
-        this.setState({firstname:event.target.value})
-    }
-    handleInputLastname = (event) => {
-        this.setState({lastname:event.target.value})
-    }
-
-    handleInputSalary = (event) => {
-        this.setState({salary:event.target.value})
+    onChange = ({ target: { name, value } }) => {
+        this.setState({ [name]: value })
     }
 
     submitLogin = (e) =>{
@@ -56,24 +49,27 @@ render(){
                 <input 
                     type="text"
                     placeholder="Enter your lastname"
+                    name='lastname'
                     value={this.state.lastname}
-                    onChange={this.handleInputLastname}
+                    onChange={this.onChange}
                 />
             </div>
             <div className="form_element">
                 <input 
                     type="text"
                     placeholder="Enter your firstname"
+                    name='firstname'
                     value={this.state.firstname}
-                    onChange={this.handleInputFirstname}
+                    onChange={this.onChange}
                 />
             </div>
             <div className="form_element">
                 <input 
                     type="number"
+                    name='salary'
                     placeholder="Enter your salary"
                     value={this.state.salary}
-                    onChange={this.handleInputSalary}
+                    onChange={this.onChange}
                 />
             </div>
             <button type="submit">Add</button>
