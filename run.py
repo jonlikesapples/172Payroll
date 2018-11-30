@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import boto3
 from boto3.session import Session
 from botocore.exceptions import ClientError
+import decimal
 from boto3.dynamodb.conditions import Key, Attr
 import utils.responses as responses
 from utils.responses import *
@@ -16,6 +17,12 @@ from keys import Keys
 from config import *
 
 
+<<<<<<< HEAD
+=======
+
+INITIALSETUP()
+
+>>>>>>> 06fc9a658d574f5c231dc460b5bec680a5e060b1
 app = Flask(__name__)
 
 session = Session(
@@ -32,6 +39,15 @@ session = Session(
 
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
+
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            if o % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
 
 @app.route('/api/')
 def hello_world():
@@ -54,6 +70,7 @@ def decimal_default(obj):
 @app.route('/api/create',methods=['GET', 'POST'])
 >>>>>>> 21f262554d08eaed42c89c8e8caa54805cec615a
 def create():
+<<<<<<< HEAD
 	loadMe = json.dumps(request.form)
 	payInfo = json.loads(loadMe)
 	try:
@@ -105,6 +122,35 @@ def employeeSignIn():
 	else:
 		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem});
 
+=======
+		name = request.args.get("name")
+		salary = request.args.get("salary")
+		email = request.args.get("email")
+		hireDate = request.args.get("hireDate")
+		department = request.args.get("department")
+		if name is None or salary is None or email is None or hireDate is None or department is None:
+			return "Something is left empty!"
+		response = table.put_item(
+			Item={
+				'userID' : str(uuid.uuid1()), #PRIMARY KEY
+				'name': name,
+				'salary': salary,
+				'email': email,
+				'hireDate' : hireDate,
+				'department': department,
+			}
+		)
+		return (jsonify(response))
+
+
+@app.route('/api/getTable', methods=['GET'])
+def getTable():
+		info=[]
+		response = table.scan()
+		for i in response['Items']:
+			info.append(json.dumps(i, cls=DecimalEncoder))
+		return (jsonify(info))
+>>>>>>> 06fc9a658d574f5c231dc460b5bec680a5e060b1
 
 <<<<<<< HEAD
 # @app.route('/query')
@@ -131,7 +177,7 @@ def login():
 	response = {
 		'code' : 200
 	}
-	return (jsonify(response));
+	return (jsonify(response))
 
 if __name__ == '__main__':
 	app.debug = True
