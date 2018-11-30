@@ -3,22 +3,25 @@ import boto3
 from boto3.session import Session
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
+import utils.responses as responses
+from utils.responses import *
+from utils.hashing import *
+from utils.config import *
 import json
+import decimal
 import socket
 import uuid
+import datetime
 from keys import Keys
 from config import *
 
 
-
-INITIALSETUP();
-
 app = Flask(__name__)
 
 session = Session(
-	aws_access_key_id = Keys.AWS_ACCESS_KEY,
-	aws_secret_access_key = Keys.AWS_SECRET_KEY,
-	region_name = Keys.AWS_REGION
+	aws_access_key_id = os.environ["AWS_ACCESS_KEY"],
+	aws_secret_access_key = os.environ["AWS_SECRET_KEY"],
+	region_name = os.environ["AWS_REGION"]
 )
 
 dynamodb = session.resource('dynamodb')
@@ -28,31 +31,78 @@ table = dynamodb.Table('172PayrollTable')
 def hello_world():
 	return "hello world"
 
+@app.route("/testdate")
+def testdate():
+	hireDate = "1/1/2018";
+	hireDate_dt_obj = datetime.datetime.strptime(hireDate,'%m/%d/%Y')
+	return dt_obj.month;
 
-@app.route('/create')
+def decimal_default(obj):
+    if isinstance(obj, decimal.Decimal):
+        return float(obj)
+    raise TypeError
+
+@app.route('/createEmployee', methods=['POST'])
 def create():
-		first_name = request.args.get("firstname")
-		last_name = request.args.get("lastname")
-		salary = request.args.get("salary")
-		if first_name is None or last_name is None or salary is None:
-			return "Something is left empty!";
+	loadMe = json.dumps(request.form)
+	payInfo = json.loads(loadMe)
+	try:
+		uuid = generate_uuid(payInfo);
 		response = table.put_item(
 			Item={
-				'userID' : str(uuid.uuid1()), #PRIMARY KEY
-				'FirstName': first_name,
-				'LastName': last_name,
-				'Salary': salary,
+				'userID' : uuid, #PRIMARY KEY
+				'name': payInfo["name"],
+				'email' : payInfo["email"],
+				'password' : sha256encrypt(payInfo["password"]),
+				'hireDate': payInfo["hireDate"], #format: MM/DD/YYYY
+				'department': payInfo["department"],
+				'salary' : int(payInfo["salary"]),
+				'admin' : int(payInfo["adminStatus"]) #0 if reg user, 1 if admin
 			}
 		)
-		return (jsonify(response));
+	except Exception as e:
+		return response_with(responses.INVALID_FIELD_NAME_SENT_422, value={"value" : str(e)});
+	else:
+		return response_with(responses.SUCCESS_200, value={"value" : uuid})
 
-@app.route('/query')
-def query():
-	response = table.query( #doesnt work properly
-		KeyConditionExpression=Key('Salary').eq(100000)
-	)
 
-	return (jsonify(response['Items']))
+#deploy to heroku
+#implement cognito
+#getwholetable
+#deleteEmployee
+
+#request time off (Form) -> notifies admin, admin approves
+
+#total paid time off available
+#---vacation history
+#------new row
+
+@app.route('/employeeSignIn', methods=['POST'])
+def employeeSignIn():
+	loadMe = json.dumps(request.form)
+	payInfo = json.loads(loadMe)
+	try:
+		uuid = generate_uuid(payInfo)
+		response = table.get_item(
+			Key={
+					'userID' : uuid
+				}
+		)
+		item = response['Item'];
+		dumpedItem = json.loads(json.dumps(item, default=decimal_default));
+	except Exception as e:
+		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
+	else:
+		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem});
+
+
+# @app.route('/query')
+# def query():
+# 	response = table.query( #doesnt work properly
+# 		KeyConditionExpression=Key('Salary').eq(100000)
+# 	)
+
+# 	return (jsonify(response['Items']))
 
 if __name__ == '__main__':
 	app.debug = True
