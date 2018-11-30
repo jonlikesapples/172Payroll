@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import boto3
 from boto3.session import Session
 from botocore.exceptions import ClientError
+import decimal
 from boto3.dynamodb.conditions import Key, Attr
 import json
 import socket
@@ -11,7 +12,7 @@ from config import *
 
 
 
-INITIALSETUP();
+INITIALSETUP()
 
 app = Flask(__name__)
 
@@ -24,6 +25,15 @@ session = Session(
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
 
+class DecimalEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, decimal.Decimal):
+            if o % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
+
 @app.route('/api/')
 def hello_world():
 	return "hello world"
@@ -31,20 +41,33 @@ def hello_world():
 
 @app.route('/api/create',methods=['GET', 'POST'])
 def create():
-		first_name = request.args.get("firstname")
-		last_name = request.args.get("lastname")
+		name = request.args.get("name")
 		salary = request.args.get("salary")
-		if first_name is None or last_name is None or salary is None:
-			return "Something is left empty!";
+		email = request.args.get("email")
+		hireDate = request.args.get("hireDate")
+		department = request.args.get("department")
+		if name is None or salary is None or email is None or hireDate is None or department is None:
+			return "Something is left empty!"
 		response = table.put_item(
 			Item={
 				'userID' : str(uuid.uuid1()), #PRIMARY KEY
-				'FirstName': first_name,
-				'LastName': last_name,
-				'Salary': salary,
+				'name': name,
+				'salary': salary,
+				'email': email,
+				'hireDate' : hireDate,
+				'department': department,
 			}
 		)
-		return (jsonify(response));
+		return (jsonify(response))
+
+
+@app.route('/api/getTable', methods=['GET'])
+def getTable():
+		info=[]
+		response = table.scan()
+		for i in response['Items']:
+			info.append(json.dumps(i, cls=DecimalEncoder))
+		return (jsonify(info))
 
 @app.route('/api/query')
 def query():
@@ -63,7 +86,7 @@ def login():
 	response = {
 		'code' : 200
 	}
-	return (jsonify(response));
+	return (jsonify(response))
 
 if __name__ == '__main__':
 	app.debug = True

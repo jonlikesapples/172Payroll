@@ -6,9 +6,11 @@ class Create extends Component {
     constructor(props) {
 		super(props)
 		this.state = {
-            firstname:'',
-            lastname:'',
-            salary:''
+            name:'',
+            salary:'',
+            email:'',
+            hireDate:'',
+            department:''
         }
         this.submitLogin = this.submitLogin.bind(this)
         //this.Auth = new Authserver();
@@ -22,10 +24,12 @@ class Create extends Component {
 
     submitLogin = (e) =>{
         e.preventDefault();
-        let firstname = this.state.firstname;
-        let lastname = this.state.lastname;
+        let name = this.state.name;
         let salary = this.state.salary;
-        axios.post(`/api/create?firstname=${firstname}&lastname=${lastname}&salary=${salary}`)
+        let email = this.state.email;
+        let hireDate = this.state.hireDate;
+        let department = this.state.department;
+        axios.post(`/api/create?name=${name}&salary=${salary}&email=${email}&hireDate=${hireDate}&department=${department}`)
             .then(res=>{   
                 console.log(res.data)
             })
@@ -41,38 +45,61 @@ class Create extends Component {
 
 render(){
     return (    
-        <div className="login_container" style={{margin:"25%"}}>
+        <div className="login_container">
         <div style ={{border:"1px solid #c2c2c2",textAlign: "center"}}>
         <form onSubmit={this.submitLogin}>
-            <h2>Add you info</h2>
+            <h2>Add Employee info</h2>
             <div className="form_element">
+            Name: 
                 <input 
                     type="text"
-                    placeholder="Enter your lastname"
-                    name='lastname'
-                    value={this.state.lastname}
+                    placeholder="Enter name"
+                    name='name'
+                    value={this.state.name}
                     onChange={this.onChange}
                 />
             </div>
             <div className="form_element">
-                <input 
-                    type="text"
-                    placeholder="Enter your firstname"
-                    name='firstname'
-                    value={this.state.firstname}
-                    onChange={this.onChange}
-                />
-            </div>
-            <div className="form_element">
+            Salary: 
                 <input 
                     type="number"
                     name='salary'
-                    placeholder="Enter your salary"
+                    placeholder="Enter salary"
                     value={this.state.salary}
                     onChange={this.onChange}
                 />
             </div>
-            <button type="submit">Add</button>
+            <div className="form_element">
+            Email: 
+            <input 
+                    type="email"
+                    name='email'
+                    placeholder="Enter email"
+                    value={this.state.email}
+                    onChange={this.onChange}
+                />
+            </div>
+            <div className="form_element">
+            Department: 
+            <input 
+                    type="text"
+                    name='department'
+                    placeholder="Enter department"
+                    value={this.state.department}
+                    onChange={this.onChange}
+                />
+            </div>
+            <div className="form_element">
+            Hired Date: 
+            <input 
+                    type="date"
+                    name='hireDate'
+                    placeholder="mm/dd/yyyy"
+                    value={this.state.hireDate}
+                    onChange={this.onChange}
+                />
+            </div>
+            <button type="submit" className="btn btn-info btn-sm">Add</button>
             </form>
             </div>
             </div>
