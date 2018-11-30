@@ -19,15 +19,21 @@ from config import *
 app = Flask(__name__)
 
 session = Session(
+<<<<<<< HEAD
 	aws_access_key_id = os.environ["AWS_ACCESS_KEY"],
 	aws_secret_access_key = os.environ["AWS_SECRET_KEY"],
 	region_name = os.environ["AWS_REGION"]
+=======
+	aws_access_key_id = Keys.AWS_ACCESS_KEY,
+	aws_secret_access_key = Keys.AWS_SECRET_KEY,
+	region_name = "us-east-2"
+>>>>>>> 21f262554d08eaed42c89c8e8caa54805cec615a
 )
 
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
 
-@app.route('/')
+@app.route('/api/')
 def hello_world():
 	return "hello world"
 
@@ -42,7 +48,11 @@ def decimal_default(obj):
         return float(obj)
     raise TypeError
 
+<<<<<<< HEAD
 @app.route('/createEmployee', methods=['POST'])
+=======
+@app.route('/api/create',methods=['GET', 'POST'])
+>>>>>>> 21f262554d08eaed42c89c8e8caa54805cec615a
 def create():
 	loadMe = json.dumps(request.form)
 	payInfo = json.loads(loadMe)
@@ -96,13 +106,32 @@ def employeeSignIn():
 		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem});
 
 
+<<<<<<< HEAD
 # @app.route('/query')
 # def query():
 # 	response = table.query( #doesnt work properly
 # 		KeyConditionExpression=Key('Salary').eq(100000)
 # 	)
+=======
+@app.route('/api/query')
+def query():
+	response = table.query( #doesnt work properly
+		KeyConditionExpression=Key('Salary').eq(100000)
+	)
+>>>>>>> 21f262554d08eaed42c89c8e8caa54805cec615a
 
 # 	return (jsonify(response['Items']))
+
+@app.route('/api/login',methods=['GET', 'POST'])
+def login():
+	username = request.args.get("username")
+	password = request.args.get("password")
+	print(username)
+	print(password)
+	response = {
+		'code' : 200
+	}
+	return (jsonify(response));
 
 if __name__ == '__main__':
 	app.debug = True
