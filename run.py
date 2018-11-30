@@ -69,7 +69,7 @@ def getTable():
 			info.append(json.dumps(i, cls=DecimalEncoder))
 		return (jsonify(info))
 
-@app.route('/api/query')
+@app.route('/api/query') #
 def query():
 	response = table.query( #doesnt work properly
 		KeyConditionExpression=Key('Salary').eq(100000)
