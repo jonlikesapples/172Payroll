@@ -12,15 +12,20 @@ import json
 import socket
 import uuid
 from keys import Keys
+<<<<<<< HEAD
 from config import *
 from TwitterAPI import TwitterAPI
+=======
+# from config import *
+
+>>>>>>> ba07d362c81fe84cc2c51d52092252d555565ba8
 
 app = Flask(__name__)
 
 session = Session(
 	aws_access_key_id = os.environ["AWS_ACCESS_KEY"],
 	aws_secret_access_key = os.environ["AWS_SECRET_KEY"],
-	region_name = os.environ["AWS_REGION"]
+	region_name = os.environ["AWS_REGION_NAME"]
 )
 
 dynamodb = session.resource('dynamodb')
@@ -61,7 +66,6 @@ def create():
 		# if name is None or salary is None or email is None or hireDate is None or department is None:
 		# 	return "Something is left empty!"
 		loadMe = json.dumps(request.get_json(silent=True)["info"])
-		print(loadMe)
 		payInfo = json.loads(loadMe)
 		admin = payInfo["admin"]
 		try:
