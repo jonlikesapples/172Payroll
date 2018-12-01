@@ -12,13 +12,8 @@ import json
 import socket
 import uuid
 from keys import Keys
-<<<<<<< HEAD
 from config import *
 from TwitterAPI import TwitterAPI
-=======
-# from config import *
-
->>>>>>> ba07d362c81fe84cc2c51d52092252d555565ba8
 
 app = Flask(__name__)
 
