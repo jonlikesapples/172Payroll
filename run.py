@@ -12,7 +12,6 @@ import json
 import socket
 import uuid
 from keys import Keys
-# from config import *
 
 
 app = Flask(__name__)
