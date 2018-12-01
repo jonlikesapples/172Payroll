@@ -24,12 +24,16 @@ class Create extends Component {
 
     submitLogin = (e) =>{
         e.preventDefault();
-        let name = this.state.name;
-        let salary = this.state.salary;
-        let email = this.state.email;
-        let hireDate = this.state.hireDate;
-        let department = this.state.department;
-        axios.post(`/api/create?name=${name}&salary=${salary}&email=${email}&hireDate=${hireDate}&department=${department}`)
+        var info = {
+        name : this.state.name,
+        salary : this.state.salary,
+        email : this.state.email,
+        hireDate : this.state.hireDate,
+        department : this.state.department,
+        admin:0,
+        password:'password'
+        }
+        axios.post(`/api/create`,{info})
             .then(res=>{   
                 console.log(res.data)
             })

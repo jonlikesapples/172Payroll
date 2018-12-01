@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 import Create from './create'
+import Tweet from './tweet'
 
 const styles = theme => ({
     root: {
@@ -40,13 +41,8 @@ class AdminTable extends Component {
    componentDidMount(){
        axios.get('/api/getTable')
        .then(res=>{
-           var obj =[];
-           for(var i = 0; i < res.data.length;i++){
-                var item = JSON.parse(res.data[i])
-                obj.push(item)
-           }
-
-           this.setState({info: obj})
+           console.log(res.data.value)
+           this.setState({info: res.data.value})
        })
    }
 
@@ -57,11 +53,19 @@ class AdminTable extends Component {
         <div className="container" style={{marginTop:40}}>
             <p>{  (today.getMonth()+1) + "/" + today.getDate() + "/" + today.getFullYear()}</p>
             <div style={{textAlign:"right"}}>
+
             <Popup trigger={<button style={{boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)'}} 
             className="btn btn-info btn-sm"> Add Employee</button>} modal>
                 <Create />
             </Popup><br/>
-                <button className="btn btn-primary btn-sm" style={{marginTop:5}}>Delete Employee</button>
+
+                <button className="btn btn-primary btn-sm" style={{marginTop:5,boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)'}}>Delete Employee</button><br/>
+
+                <Popup trigger={<button style={{boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)',marginTop:5}} 
+            className="btn btn-info btn-sm"> Tweet </button>} modal>
+                <Tweet />
+            </Popup><br/>
+            
             </div>
             <div style={{textAlign:'center'}}>
             <Table className={classes.table}>
