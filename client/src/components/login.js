@@ -1,8 +1,21 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 
-class Login extends Component {
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
 
+const styles = theme => ({
+    button: {
+      margin: theme.spacing.unit,
+    },
+    input: {
+      display: 'none',
+    },
+  });
+  
+
+class Login extends Component {
     constructor(props) {
 		super(props)
 		this.state = {
@@ -46,33 +59,20 @@ class Login extends Component {
     
 
 render(){
+    const { classes } = this.props;
+
     return (    
-        <div className="login_container" style={{margin:"25%"}}>
-        <div style ={{border:"1px solid #c2c2c2",textAlign: "center"}}>
-        <form onSubmit={this.submitLogin} style={{display: "inline-block"}}>
-            <h2>Log in here</h2>
-            <div className="form_element">
-                <input 
-                    type="text"
-                    placeholder="Enter your username"
-                    value={this.state.username}
-                    onChange={this.handleInputUsername}
-                />
-            </div>
-            <div className="form_element">
-                <input 
-                    type="password"
-                    placeholder="Enter your password"
-                    value={this.state.password}
-                    onChange={this.handleInputPassword}
-                />
-            </div>
-            <button type="submit">Log in</button>
-            </form>
-            </div>
+        <div className="login_container" style={{textAlign:"center"}}>
+            <Button variant="contained" color="primary" className={classes.button}>
+                Sign in with Slack
+            </Button>
             </div>
     );
 }   
 };
 
-export default Login;
+Login.propTypes = {
+    classes: PropTypes.object.isRequired,
+  };
+  
+  export default withStyles(styles)(Login);
