@@ -12,7 +12,7 @@ import json
 import socket
 import uuid
 from keys import Keys
-from config import *
+# from config import *
 
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ app = Flask(__name__)
 session = Session(
 	aws_access_key_id = os.environ["AWS_ACCESS_KEY"],
 	aws_secret_access_key = os.environ["AWS_SECRET_KEY"],
-	region_name = os.environ["AWS_REGION"]
+	region_name = os.environ["AWS_REGION_NAME"]
 )
 
 dynamodb = session.resource('dynamodb')
