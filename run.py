@@ -4,6 +4,7 @@ from boto3.session import Session
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
 import utils.responses as responses
+from warrant import Cognito
 from utils.responses import *
 from utils.hashing import *
 from utils.config import *
@@ -25,6 +26,8 @@ session = Session(
 
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
+client_id = os.environ["COGNITO_CLIENT_ID"];
+pool_id = os.environ["COGNITO_POOL_ID"]
 
 consumer_key = os.environ["consumer_key"]
 consumer_secret = os.environ["consumer_secret"]
@@ -51,15 +54,57 @@ def decimal_default(obj):
 def hello_world():
 	return "hello world"
 
+@app.route('/cognito/signup')
+def cognito_signup():
+	email = "sdads@gmail.com"
+	password = "Password1"
+	u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
+				secret_key=os.environ["AWS_SECRET_KEY"]);
+
+	u.add_base_attributes(email=email, name="jon");
+	res = u.register(email, password);
+	return response_with(responses.SUCCESS_200, value=res)
+
+@app.route('/cognito/login')
+def cognito_login():
+	try:
+		email = "jonlikesapples@gmail.com"
+		password = "Password1"
+		u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
+					secret_key=os.environ["AWS_SECRET_KEY"], username=email);
+		u.authenticate(password=password);
+		userResponse = {
+				"username" : u.username,
+				"id_token" : u.id_token,
+				"access_token" : u.access_token,
+				"refresh_token" : u.refresh_token,
+				"token_type" : u.token_type
+		}
+		return response_with(responses.SUCCESS_200, value=userResponse)
+	except Exception as e:
+		return response_with(responses.UNAUTHORIZED_403, value={"value" : e.args})
+
+@app.route('/cognito/logout', methods=['POST'])
+def cognito_logout():
+	try:
+		access_token = json.loads(json.dumps(request.form))["access_token"]
+		u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
+					secret_key=os.environ["AWS_SECRET_KEY"], access_token=access_token);
+		u.logout();
+		userResponse = {
+				"username" : u.username,
+				"id_token" : u.id_token,
+				"access_token" : u.access_token,
+				"refresh_token" : u.refresh_token,
+				"token_type" : u.token_type
+		}
+		return response_with(responses.SUCCESS_200, value=userResponse);
+	except Exception as e:
+		return response_with(resp.SERVER_ERROR_500, error=e.args);
+	return access_token;
+
 @app.route('/api/create',methods=['GET', 'POST'])
 def create():
-		# name = request.args.get("name")
-		# salary = request.args.get("salary")
-		# email = request.args.get("email")
-		# hireDate = request.args.get("hireDate")
-		# department = request.args.get("department")
-		# if name is None or salary is None or email is None or hireDate is None or department is None:
-		# 	return "Something is left empty!"
 		loadMe = json.dumps(request.get_json(silent=True)["info"])
 		payInfo = json.loads(loadMe)
 		admin = payInfo["admin"]
