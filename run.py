@@ -24,8 +24,8 @@ session = Session(
 
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
-client_id = "1htd916grmnak53cvvq3cnsnjq";
-pool_id = "us-east-2_kugcHNMgX";
+client_id = os.environ["COGNITO_CLIENT_ID"];
+pool_id = os.environ["COGNITO_POOL_ID"]
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
