@@ -10,7 +10,8 @@ class Create extends Component {
             salary:'',
             email:'',
             hireDate:'',
-            department:''
+            department:'',
+            message:''
         }
         this.submitLogin = this.submitLogin.bind(this)
         //this.Auth = new Authserver();
@@ -36,6 +37,11 @@ class Create extends Component {
         axios.post(`/api/create`,{info})
             .then(res=>{   
                 console.log(res.data)
+                if(res.data.http_code == 200){
+                    this.setState({message:"Successfully add this employee"})
+                }else{
+                    this.setState({message:"Not able to add this employee"})
+                }
             })
 
     }
@@ -48,10 +54,17 @@ class Create extends Component {
     
 
 render(){
-    return (    
+    return (
         <div className="login_container">
-        <div style ={{border:"1px solid #c2c2c2",textAlign: "center"}}>
-        <form onSubmit={this.submitLogin}>
+            {this.state.message ?
+                <div className="alert alert-success" role="alert">
+                    {this.state.message}
+                </div>
+                :
+                null
+            }
+            <div style={{ border: "1px solid #c2c2c2", textAlign: "center" }}>
+                <form onSubmit={this.submitLogin}>
             <h2>Add Employee info</h2>
             <div className="form_element">
             Name: 

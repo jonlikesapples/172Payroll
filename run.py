@@ -116,10 +116,26 @@ def login():
 @app.route('/api/twitter',methods=["POST"])
 def twitter():
 	TWEET_TEXT = request.get_json()['text']
-	print(TWEET_TEXT)
 	r = api.request('statuses/update', {'status': TWEET_TEXT})
 	print('SUCCESS' if r.status_code == 200 else 'PROBLEM: ' + r.text)
 	return str(r.status_code)
+
+
+@app.route('/api/delete', methods=['DELETE'])
+def delete():
+   loadMe = json.dumps(request.get_json()["id"])
+   payInfo = json.loads(loadMe)
+   try:
+       response = table.delete_item(
+           Key={
+               'userID' : payInfo
+           }
+       )
+       response = json.loads(json.dumps(response))
+   except Exception as e:
+       return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
+   else:
+       return response_with(responses.SUCCESS_200, value={"value": response});
 
 if __name__ == '__main__':
 	app.debug = True

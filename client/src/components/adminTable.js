@@ -34,23 +34,40 @@ class AdminTable extends Component {
     constructor(){
         super()
         this.state={
-            info:[]
+            info:[],
+            delete:false
         }
+        this.handleDelete = this.handleDelete.bind(this)
     }
 
    componentDidMount(){
        axios.get('/api/getTable')
        .then(res=>{
            console.log(res.data.value)
+           res.data.value.forEach(element => {
+               element.select = false;
+           });
            this.setState({info: res.data.value})
        })
    }
 
+   handleDelete(){
+       this.setState({delete:!this.state.delete})
+   }
+
+   deleteUser(id){
+       axios.delete('/api/delete',{data: {id: id}})
+            .then(res=> {
+                console.log(res.data)
+                window.location.reload()
+            })
+   }
+
     render() {
-        console.log(this.state.info)
+        console.log(this.state)
         const { classes } = this.props;
         return (
-        <div className="container" style={{marginTop:40}}>
+        <div style={{marginTop:40,marginLeft:10,marginRight:10}}>
             <p>{  (today.getMonth()+1) + "/" + today.getDate() + "/" + today.getFullYear()}</p>
             <div style={{textAlign:"right"}}>
 
@@ -59,10 +76,12 @@ class AdminTable extends Component {
                 <Create />
             </Popup><br/>
 
-                <button className="btn btn-primary btn-sm" style={{marginTop:5,boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)'}}>Delete Employee</button><br/>
+                <button className="btn btn-primary btn-sm"
+                onClick={()=>this.handleDelete()} 
+                style={{marginTop:5,boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)'}}>Delete Employee</button><br/>
 
-                <Popup trigger={<button style={{boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)',marginTop:5}} 
-            className="btn btn-info btn-sm"> Tweet </button>} modal>
+            <Popup trigger={<button style={{boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)',marginTop:5}} 
+            className="btn btn-info btn-sm"> Post a Tweet </button>} modal>
                 <Tweet />
             </Popup><br/>
             
@@ -71,6 +90,10 @@ class AdminTable extends Component {
             <Table className={classes.table}>
               <TableHead>
                 <TableRow>
+                    {this.state.delete ?  
+                    <TableCell>
+                    </TableCell>
+                 : null}
                   <TableCell>Employee Name</TableCell>
                   <TableCell numeric>Employee ID</TableCell>
                   <TableCell >Hired Date</TableCell>
@@ -83,6 +106,12 @@ class AdminTable extends Component {
                 {this.state.info.map(row => {
                   return (
                     <TableRow key={row.userID}>
+                    
+                    {this.state.delete ? 
+                    <TableCell> 
+                        <button type="button" className="btn btn-danger btn-sm" onClick={()=>this.deleteUser(row.userID)}> delete </button>
+                    </TableCell>
+                    : null}  
                       <TableCell component="th" scope="row">
                         {row.name}
                       </TableCell>
