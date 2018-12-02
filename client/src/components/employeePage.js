@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 
-const checkoutPanel = { background: '#FFFFFF', marginBottom: '0', padding: '1rem', "borderRadius": "25px", border: '4px solid #c2c2c2', maxWidth: '70rem', marginLeft: "30px", marginBottom: "30px" }
+const checkoutPanel = { background: '#FFFFFF', padding: '1rem', "borderRadius": "25px", border: '4px solid #c2c2c2', maxWidth: '70rem', marginLeft: "30px", marginBottom: "30px" }
 
 class EmployeePage extends Component {
     constructor() {

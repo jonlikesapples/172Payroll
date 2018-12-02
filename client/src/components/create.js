@@ -37,10 +37,10 @@ class Create extends Component {
         axios.post(`/api/create`,{info})
             .then(res=>{   
                 console.log(res.data)
-                if(res.data.http_code == 200){
+                if(res.data.http_code === 200){
                     this.setState({message:"Successfully add this employee"})
                 }else{
-                    this.setState({message:"Not able to add this employee"})
+                    this.setState({error:"Not able to add this employee"})
                 }
             })
 
@@ -59,6 +59,13 @@ render(){
             {this.state.message ?
                 <div className="alert alert-success" role="alert">
                     {this.state.message}
+                </div>
+                :
+                null
+            }
+            {this.state.error ?
+                <div className="alert alert-danger" role="alert">
+                    {this.state.error}
                 </div>
                 :
                 null
