@@ -85,7 +85,7 @@ def decimal_default(obj):
 def hello_world():
 	return "hello world"
 
-<<<<<<< HEAD
+
 @app.route("/testdate")
 def testdate():
 	hireDate = "1/1/2018";
@@ -96,7 +96,7 @@ def decimal_default(obj):
     if isinstance(obj, decimal.Decimal):
         return float(obj)
     raise TypeError
-=======
+
 @app.route('/cognito/logout', methods=['POST'])
 def cognito_logout():
 	try:
@@ -115,16 +115,9 @@ def cognito_logout():
 	except Exception as e:
 		return response_with(resp.SERVER_ERROR_500, error=e.args);
 	return access_token;
->>>>>>> 46d994e0250be8afa1ce1cdfd787b99d57263006
 
-<<<<<<< HEAD
-@app.route('/createEmployee', methods=['POST'])
-=======
 @app.route('/api/create',methods=['GET', 'POST'])
->>>>>>> 21f262554d08eaed42c89c8e8caa54805cec615a
 def create():
-<<<<<<< HEAD
-<<<<<<< HEAD
 	loadMe = json.dumps(request.form)
 	payInfo = json.loads(loadMe)
 	try:
@@ -176,30 +169,9 @@ def employeeSignIn():
 	else:
 		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem});
 
-=======
-		name = request.args.get("name")
-		salary = request.args.get("salary")
-		email = request.args.get("email")
-		hireDate = request.args.get("hireDate")
-		department = request.args.get("department")
-		if name is None or salary is None or email is None or hireDate is None or department is None:
-			return "Something is left empty!"
-		response = table.put_item(
-			Item={
-				'userID' : str(uuid.uuid1()), #PRIMARY KEY
-				'name': name,
-				'salary': salary,
-				'email': email,
-				'hireDate' : hireDate,
-				'department': department,
-			}
-		)
-		return (jsonify(response))
-=======
 		loadMe = json.dumps(request.get_json(silent=True)["info"])
 		payInfo = json.loads(loadMe)
 		admin = payInfo["admin"]
->>>>>>> 46d994e0250be8afa1ce1cdfd787b99d57263006
 
 		u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
 				secret_key=os.environ["AWS_SECRET_KEY"]);
@@ -238,7 +210,6 @@ def getWholeTable():
 		for i in response['Items']:
 			info.append(json.dumps(i, cls=DecimalEncoder))
 		return (jsonify(info))
->>>>>>> 06fc9a658d574f5c231dc460b5bec680a5e060b1
 
 <<<<<<< HEAD
 # @app.route('/query')
