@@ -12,7 +12,9 @@ import decimal
 import json
 import socket
 import uuid
-
+from keys import Keys
+from config import *
+from TwitterAPI import TwitterAPI
 
 app = Flask(__name__)
 
@@ -26,6 +28,13 @@ dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
 client_id = os.environ["COGNITO_CLIENT_ID"];
 pool_id = os.environ["COGNITO_POOL_ID"]
+
+consumer_key = os.environ["consumer_key"]
+consumer_secret = os.environ["consumer_secret"]
+access_token_key = os.environ["access_token_key"]
+access_token_secret = os.environ["access_token_secret"]
+
+api = TwitterAPI(consumer_key, consumer_secret, access_token_key, access_token_secret)
 
 class DecimalEncoder(json.JSONEncoder):
     def default(self, o):
@@ -66,7 +75,7 @@ def cognito_logout():
 
 @app.route('/api/create',methods=['GET', 'POST'])
 def create():
-		loadMe = json.dumps(request.form)
+		loadMe = json.dumps(request.get_json(silent=True)["info"])
 		payInfo = json.loads(loadMe)
 		admin = payInfo["admin"]
 
@@ -78,7 +87,7 @@ def create():
 		res = u.register(payInfo["email"], payInfo["password"]);
 
 		try:
-			uuid = generate_uuid(payInfo);
+			uuid = generate_uuid(payInfo)
 			response = table.put_item(
 				Item={
 					'userID' : uuid,
@@ -134,6 +143,29 @@ def login():
 
 	except Exception as e:
 		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
+
+@app.route('/api/twitter',methods=["POST"])
+def twitter():
+	TWEET_TEXT = request.get_json()['text']
+	r = api.request('statuses/update', {'status': TWEET_TEXT})
+	print('SUCCESS' if r.status_code == 200 else 'PROBLEM: ' + r.text)
+	return str(r.status_code)
+
+@app.route('/api/delete', methods=['DELETE'])
+def delete():
+   loadMe = json.dumps(request.get_json()["id"])
+   payInfo = json.loads(loadMe)
+   try:
+       response = table.delete_item(
+           Key={
+               'userID' : payInfo
+           }
+       )
+       response = json.loads(json.dumps(response))
+   except Exception as e:
+       return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
+   else:
+       return response_with(responses.SUCCESS_200, value={"value": response});
 
 if __name__ == '__main__':
 	app.debug = True
