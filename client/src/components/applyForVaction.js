@@ -28,12 +28,31 @@ class ApplyForVaction extends Component {
         axios.post('/api/requesttimeoff',{info})
             .then(res=>{
                 console.log(res.data)
+                if(res.data.http_code === 200){
+                    this.setState({success:"Successfully Apply"})
+                }else{
+                    this.setState({error:"fail to apply"})
+                }
             })
     }
 
     render() {
         return (
             <div>
+                 {this.state.success ?
+                <div className="alert alert-success" role="alert">
+                    {this.state.success}
+                </div>
+                :
+                null
+            }
+            {this.state.error ?
+                <div className="alert alert-danger" role="alert">
+                    {this.state.error}
+                </div>
+                :
+                null
+            }
                 <form onSubmit={this.submitForm}>
                 <div className="form_element">
                 Start Date

@@ -81,6 +81,30 @@ class AdminTable extends Component {
     this.props.history.push('/');
    }
 
+   handleApprove(id,index){
+        const info ={
+            tiemStatus:1,
+            timeoffID:id
+        }
+        axios.post('/api/acceptrequest',{info})
+            .then(res=>{
+                console.log(res.data)
+               this.state.timeoff[index].timeStatus = 1
+               this.forceUpdate()
+            })
+   }
+   handleDecline(id,index){
+    const info ={
+        tiemStatus:0,
+        timeoffID:id
+    }
+    axios.post('/api/rejectrequest',{info})
+        .then(res=>{
+            console.log(res.data)
+            this.state.timeoff[index].timeStatus = 0
+            this.forceUpdate()
+        })
+   }
     render() {
         const { classes } = this.props;
         return (
@@ -165,24 +189,24 @@ class AdminTable extends Component {
                                 <TableCell>Employee ID</TableCell>
                                 <TableCell>StartDate</TableCell>
                                 <TableCell>EndDate</TableCell>
-                                <TableCell>tiemStatus</TableCell>
+                                <TableCell>timeStatus</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                            {this.state.timeoff.map(row => {
+                            {this.state.timeoff.map((row,index) => {
                                 return (
                                     <TableRow key={row.timeoffID}>
                                         <TableCell component="th" scope="row">{row.userID}</TableCell>
                                         <TableCell >{row.startDate}</TableCell>
                                         <TableCell >{row.endDate}</TableCell>
-                                        <TableCell>{row.tiemStatus == 2 ? 
+                                        <TableCell>{row.timeStatus == 2 ? 
                                             <div>
-                                                <button className="btn btn-success btn-sm">Approve</button>
-                                                <button className="btn btn-danger btn-sm">Decline</button>
+                                                <button className="btn btn-success btn-sm" onClick={()=>this.handleApprove(row.timeoffID,index)}>Approve</button>
+                                                <button className="btn btn-danger btn-sm" onClick={()=>this.handleDecline(row.timeoffID,index)}>Decline</button>
                                             </div>
                                             : null}
-                                                    {row.tiemStatus == 1 ? <h5>Accept</h5>: null}
-                                                    {row.tiemStatus == 0 ? <h5>Decline</h5>: null}
+                                                    {row.timeStatus == 1 ? <h5>Accept</h5>: null}
+                                                    {row.timeStatus == 0 ? <h5>Decline</h5>: null}
                                         </TableCell>
                                     </TableRow>
                                 );

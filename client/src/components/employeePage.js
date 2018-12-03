@@ -113,7 +113,7 @@ class EmployeePage extends Component {
                                     </div>
                                     <div className="form-group col-md-2">
                                         <label htmlFor="inputZip">Hired Date</label>
-                                        <h3>{this.state.hiredate}</h3>
+                                        <h3>{this.state.hireDate}</h3>
                                     </div>
                                 </div>
                             </form>
@@ -127,7 +127,7 @@ class EmployeePage extends Component {
                                 <TableCell>Employee ID</TableCell>
                                 <TableCell>StartDate</TableCell>
                                 <TableCell>EndDate</TableCell>
-                                <TableCell>tiemStatus</TableCell>
+                                <TableCell>timeStatus</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -137,11 +137,11 @@ class EmployeePage extends Component {
                                         <TableCell component="th" scope="row">{row.userID}</TableCell>
                                         <TableCell >{row.startDate}</TableCell>
                                         <TableCell >{row.endDate}</TableCell>
-                                        <TableCell>{row.tiemStatus == 2 ? 
+                                        <TableCell>{row.timeStatus == 2 ? 
                                             <h5>Pending</h5>
                                             : null}
-                                                    {row.tiemStatus == 1 ? <h5>Accept</h5>: null}
-                                                    {row.tiemStatus == 0 ? <h5>Decline</h5>: null}
+                                                    {row.timeStatus == 1 ? <h5>Accept</h5>: null}
+                                                    {row.timeStatus == 0 ? <h5>Decline</h5>: null}
                                         </TableCell>
                                     </TableRow>
                                 );
