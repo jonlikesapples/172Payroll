@@ -25,6 +25,7 @@ session = Session(
 
 dynamodb = session.resource('dynamodb')
 table = dynamodb.Table('172PayrollTable')
+timeOffTable = dynamodb.Table('172TimeOffTable')
 client_id = os.environ["COGNITO_CLIENT_ID"];
 pool_id = os.environ["COGNITO_POOL_ID"]
 
@@ -175,6 +176,46 @@ def delete():
        return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
    else:
        return response_with(responses.SUCCESS_200, value={"value": response});
+
+@app.route('/api/requesttimeoff', methods=['POST'])
+def request_time_off():
+	timeoffInfo = json.loads(json.dumps(request.form))
+	#columns
+	#timeoffid, userid, start date, enddate, status (0,1,2)
+	try:
+		response = timeOffTable.put_item(
+			Item = {
+				"timeoffID" : sha256encrypt(timeoffInfo["userID"]+timeoffInfo["startDate"]+timeoffInfo["endDate"]),
+				"userID" : timeoffInfo["userID"],
+				"startDate" : timeoffInfo["startDate"],
+				"endDate" : timeoffInfo["endDate"],
+				"status" : 2
+			}
+		)
+	except Exception as e:
+		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
+	else:
+		return response_with(responses.SUCCESS_200, value={"value" : "yay"});
+
+@app.route('/api/admingetrequests', methods=['GET'])
+def admin_get_requests():
+	fe = Key('status').eq(2);
+	response = timeOffTable.scan( FilterExpression = fe )
+	item = response["Items"]
+	convertedItem = json.loads(json.dumps(item, default=decimal_default))
+	# return jsonify(convertedItem);
+	# return json(response["Items"])
+	return response_with(responses.SUCCESS_200, value={"value":convertedItem})
+
+@app.route('/api/acceptrequest', methods=['POST'])
+def accept_request():
+	timeOffTable = json.loads(json.dumps(request.form))
+	try:
+		response = timeOffTable.update_item(
+			Key= {
+
+			}
+		)
 
 if __name__ == '__main__':
 	app.debug = True
