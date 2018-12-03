@@ -13,7 +13,6 @@ import json
 import socket
 import uuid
 from keys import Keys
-from config import *
 from TwitterAPI import TwitterAPI
 
 app = Flask(__name__)
@@ -137,9 +136,9 @@ def login():
 		adminStatus = convertedItem['admin'];
 		wholeTable = getTable();
 		if (adminStatus == 1):
-			return response_with(responses.SUCCESS_200, value={"value" : wholeTable}, message={"admin" : adminStatus});
+			return response_with(responses.SUCCESS_200, value={"value" : wholeTable}, message={"userID" : uuid, "admin" : adminStatus});
 		elif (adminStatus == 0): #just a reg employee
-			return response_with(responses.SUCCESS_200, value={"value": convertedItem}, message={"admin" : adminStatus}); #returns just user
+			return response_with(responses.SUCCESS_200, value={"value": convertedItem}, message={"userID" : uuid, "admin" : adminStatus}); #returns just user
 
 	except Exception as e:
 		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
