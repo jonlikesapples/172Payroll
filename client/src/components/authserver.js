@@ -1,5 +1,9 @@
+import decode from 'jwt-decode';
+
 export default class Authserver {
-    
+    constructor() { 
+
+    }
     loggedIn() {
         // Checks if there is a saved token and it's still valid
         const token = this.getToken() // GEtting token from localstorage
@@ -12,6 +16,7 @@ export default class Authserver {
     logout() {
         // Clear user token and profile data from localStorage
         localStorage.removeItem('id_token');
+        localStorage.removeItem('admin');
     }
     isTokenExpired(token) {
         try {
@@ -23,6 +28,14 @@ export default class Authserver {
                 return false;
         }
         catch (err) {
+            return false;
+        }
+    }
+    isAdmin(){
+        const admin = localStorage.getItem('admin')
+        if(admin === 1){
+            return true
+        }else{
             return false;
         }
     }

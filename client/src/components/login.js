@@ -46,11 +46,12 @@ class Login extends Component {
         axios.post('/api/login',{user})
             .then(res =>{
                 console.log(res.data)
-                const id_token = res.data.id_token
-                localStorage.setItem('id_token',id_token)
                 if(res.data.http_code === 200)
                 {
-                    this.setState({redirect:true,email:res.data.username})
+                    const id_token = res.data.userID
+                    localStorage.setItem('id_token',id_token)
+                    localStorage.setItem('admin',res.data.admin)
+                    this.setState({redirect:true,admin:res.data.admin, info:res.data.value})
                 }
             })
     }
@@ -63,13 +64,14 @@ class Login extends Component {
     
 
 render(){
-    const {redirect,email} = this.state
+    const {redirect,admin,info} = this.state
 
-    if (redirect && email === "jonlikesapples@gmail.com") {
+    if (redirect && admin === 1) {
         return (
           <Redirect
             to={{
               pathname: "/employeesTable",
+              state : {info:info}
             }}
           />
         );
@@ -78,7 +80,7 @@ render(){
         <Redirect
         to={{
           pathname: "/employee",
-          state: { username: email }
+          state : {info:info}
         }}
       />
           )
