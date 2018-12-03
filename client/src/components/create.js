@@ -118,7 +118,8 @@ render(){
             <div className="form_element">
             Hired Date: 
             <input 
-                    type="date"
+                    data-date="" 
+                    data-date-format="MM/DD/YYYY"
                     name='hireDate'
                     placeholder="mm/dd/yyyy"
                     value={this.state.hireDate}
@@ -128,7 +129,7 @@ render(){
                 <div>
             Password: 
             <input 
-                    type="text"
+                    type="password"
                     name='password'
                     placeholder="password"
                     value={this.state.password}

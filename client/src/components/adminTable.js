@@ -35,7 +35,8 @@ class AdminTable extends Component {
         super()
         this.state={
             info:[],
-            delete:false
+            delete:false,
+            timeoff:[]
         }
         this.handleDelete = this.handleDelete.bind(this)
         this.Auth = new Authserver()
@@ -51,6 +52,11 @@ class AdminTable extends Component {
            console.log(res.data.value)
            this.setState({info: res.data.value})
        })
+           axios.get('/api/getTimeOffTable')
+                .then(res=>{
+                    console.log(res.data.value)
+                    this.setState({timeoff:res.data.value})
+                }) 
         }
     }
 
@@ -75,6 +81,30 @@ class AdminTable extends Component {
     this.props.history.push('/');
    }
 
+   handleApprove(id,index){
+        const info ={
+            tiemStatus:1,
+            timeoffID:id
+        }
+        axios.post('/api/acceptrequest',{info})
+            .then(res=>{
+                console.log(res.data)
+               this.state.timeoff[index].timeStatus = 1
+               this.forceUpdate()
+            })
+   }
+   handleDecline(id,index){
+    const info ={
+        tiemStatus:0,
+        timeoffID:id
+    }
+    axios.post('/api/rejectrequest',{info})
+        .then(res=>{
+            console.log(res.data)
+            this.state.timeoff[index].timeStatus = 0
+            this.forceUpdate()
+        })
+   }
     render() {
         const { classes } = this.props;
         return (
@@ -156,14 +186,31 @@ class AdminTable extends Component {
                         <Table className={classes.table}>
                             <TableHead>
                                 <TableRow>
-                                <TableCell>Posts ID</TableCell>
                                 <TableCell>Employee ID</TableCell>
                                 <TableCell>StartDate</TableCell>
                                 <TableCell>EndDate</TableCell>
-                                <TableCell>Status</TableCell>
+                                <TableCell>timeStatus</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                            {this.state.timeoff.map((row,index) => {
+                                return (
+                                    <TableRow key={row.timeoffID}>
+                                        <TableCell component="th" scope="row">{row.userID}</TableCell>
+                                        <TableCell >{row.startDate}</TableCell>
+                                        <TableCell >{row.endDate}</TableCell>
+                                        <TableCell>{row.timeStatus == 2 ? 
+                                            <div>
+                                                <button className="btn btn-success btn-sm" onClick={()=>this.handleApprove(row.timeoffID,index)}>Approve</button>
+                                                <button className="btn btn-danger btn-sm" onClick={()=>this.handleDecline(row.timeoffID,index)}>Decline</button>
+                                            </div>
+                                            : null}
+                                                    {row.timeStatus == 1 ? <h5>Accept</h5>: null}
+                                                    {row.timeStatus == 0 ? <h5>Decline</h5>: null}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                             </TableBody>
                         </Table>
                     </div>

@@ -179,7 +179,8 @@ def delete():
 
 @app.route('/api/requesttimeoff', methods=['POST'])
 def request_time_off():
-	timeoffInfo = json.loads(json.dumps(request.form))
+	timeoffInfo = json.loads(json.dumps(request.get_json()["info"]))
+	print(timeoffInfo)
 	#columns
 	#timeoffid, userid, start date, enddate, status (0,1,2)
 	try:
@@ -207,13 +208,32 @@ def admin_get_requests():
 	# return json(response["Items"])
 	return response_with(responses.SUCCESS_200, value={"value":convertedItem})
 
+@app.route('/api/getTimeOffTable', methods=['GET'])
+def getTimeOffTable():
+		response = timeOffTable.scan()
+		item = response["Items"]
+		# for i in response['Items']:
+		# 	info.append(json.dumps(i, cls=DecimalEncoder))
+		dumpedItem = json.loads(json.dumps(item, default=decimal_default));
+		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem })
+
+@app.route('/api/oneUserTimeOff', methods=['GET'])
+def oneUserTimeOff():
+	userID = request.args.get("userID")
+	print(userID)
+	fe = Key('userID').eq(userID)
+	response = timeOffTable.scan( FilterExpression = fe )
+	item = response["Items"]
+	convertedItem = json.loads(json.dumps(item, default=decimal_default))
+	return response_with(responses.SUCCESS_200, value={"value":convertedItem})
+
 @app.route('/api/acceptrequest', methods=['POST'])
 def accept_request():
-	timeoffInfo = json.loads(json.dumps(request.form))
+	timeoffInfo = json.loads(json.dumps(request.get_json()["info"]))
 	try:
 		response = timeOffTable.update_item(
 			Key= {
-				"timeoffID" : generate_vacation_uuid(timeoffInfo)
+				"timeoffID" : timeoffInfo["timeoffID"]
 			},
 			UpdateExpression="set timeStatus = :val",
 			ExpressionAttributeValues={
@@ -229,11 +249,11 @@ def accept_request():
 
 @app.route('/api/rejectrequest', methods=['POST'])
 def reject_request():
-	timeoffInfo = json.loads(json.dumps(request.form))
+	timeoffInfo = json.loads(json.dumps(request.get_json()["info"]))
 	try:
 		response = timeOffTable.update_item(
 			Key= {
-				"timeoffID" : generate_vacation_uuid(timeoffInfo)
+				"timeoffID" : timeoffInfo["timeoffID"]
 			},
 			UpdateExpression="set timeStatus = :val",
 			ExpressionAttributeValues={
