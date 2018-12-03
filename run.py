@@ -186,7 +186,7 @@ def request_time_off():
 	try:
 		response = timeOffTable.put_item(
 			Item = {
-				"timeoffID" : sha256encrypt(timeoffInfo["userID"]+timeoffInfo["startDate"]+timeoffInfo["endDate"]),
+				"timeoffID" : generate_vacation_uuid(timeoffInfo),
 				"userID" : timeoffInfo["userID"],
 				"startDate" : timeoffInfo["startDate"],
 				"endDate" : timeoffInfo["endDate"],
@@ -200,7 +200,7 @@ def request_time_off():
 
 @app.route('/api/admingetrequests', methods=['GET'])
 def admin_get_requests():
-	fe = Key('status').eq(2);
+	fe = Key('timeStatus').eq(2);
 	response = timeOffTable.scan( FilterExpression = fe )
 	item = response["Items"]
 	convertedItem = json.loads(json.dumps(item, default=decimal_default))
@@ -229,16 +229,43 @@ def oneUserTimeOff():
 
 @app.route('/api/acceptrequest', methods=['POST'])
 def accept_request():
-	timeOffTable = json.loads(json.dumps(request.form))
+	timeoffInfo = json.loads(json.dumps(request.get_json()["info"]))
 	try:
 		response = timeOffTable.update_item(
 			Key= {
-
-			}
+				"timeoffID" : timeoffInfo["timeoffID"]
+			},
+			UpdateExpression="set timeStatus = :val",
+			ExpressionAttributeValues={
+				':val': decimal.Decimal(1)
+			},
+			ReturnValues="ALL_NEW"
 		)
+		requestResp = json.loads(json.dumps(response, default=decimal_default));
 	except Exception as e:
 		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
-	return response
+	else:
+		return response_with(responses.SUCCESS_200, value={"value": requestResp});
+
+@app.route('/api/rejectrequest', methods=['POST'])
+def reject_request():
+	timeoffInfo = json.loads(json.dumps(request.get_json()["info"]))
+	try:
+		response = timeOffTable.update_item(
+			Key= {
+				"timeoffID" : timeoffInfo["timeoffID"]
+			},
+			UpdateExpression="set timeStatus = :val",
+			ExpressionAttributeValues={
+				':val': decimal.Decimal(0)
+			},
+			ReturnValues="ALL_NEW"
+		)
+		requestResp = json.loads(json.dumps(response, default=decimal_default));
+	except Exception as e:
+		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
+	else:
+		return response_with(responses.SUCCESS_200, value={"value": requestResp});
 
 if __name__ == '__main__':
 	app.debug = True
