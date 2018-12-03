@@ -12,6 +12,7 @@ import TableRow from '@material-ui/core/TableRow';
 
 import Create from './create'
 import Tweet from './tweet'
+import Authserver from './authserver'
 
 const styles = theme => ({
     root: {
@@ -37,17 +38,25 @@ class AdminTable extends Component {
             delete:false
         }
         this.handleDelete = this.handleDelete.bind(this)
+        this.Auth = new Authserver()
+        this.handleLogOut = this.handleLogOut.bind(this)
+    }
+
+    componentWillMount(){
+        if(!this.Auth.loggedIn()){
+            this.props.history.push('/')
+        }else{
+            axios.get('/api/getTable')
+                    .then(res=>{
+           console.log(res.data.value)
+           this.setState({info: res.data.value})
+       })
+        }
     }
 
    componentDidMount(){
-       axios.get('/api/getTable')
-       .then(res=>{
-           console.log(res.data.value)
-           res.data.value.forEach(element => {
-               element.select = false;
-           });
-           this.setState({info: res.data.value})
-       })
+        console.log(this.props)
+        
    }
 
    handleDelete(){
@@ -61,77 +70,111 @@ class AdminTable extends Component {
                 window.location.reload()
             })
    }
+   handleLogOut(){
+    this.Auth.logout();
+    this.props.history.push('/');
+   }
 
     render() {
-        console.log(this.state)
         const { classes } = this.props;
         return (
-        <div style={{marginTop:40,marginLeft:10,marginRight:10}}>
-            <p>{  (today.getMonth()+1) + "/" + today.getDate() + "/" + today.getFullYear()}</p>
-            <div style={{textAlign:"right"}}>
+            <div style={{ marginTop: 40, marginLeft: 10, marginRight: 10 }}>
+                <p>{(today.getMonth() + 1) + "/" + today.getDate() + "/" + today.getFullYear()}</p>
+                <div style={{ textAlign: "right" }}>
 
-            <Popup trigger={<button style={{boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)'}} 
-            className="btn btn-info btn-sm"> Add Employee</button>} modal>
-                <Create />
-            </Popup><br/>
+                    <Popup trigger={<button style={{ boxShadow: '0 10px 20px -8px rgba(0, 0, 0,.7)' }}
+                        className="btn btn-info btn-sm"> Add Employee</button>} modal>
+                        <Create />
+                    </Popup><br />
 
-                <button className="btn btn-primary btn-sm"
-                onClick={()=>this.handleDelete()} 
-                style={{marginTop:5,boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)'}}>Delete Employee</button><br/>
+                    <button className="btn btn-primary btn-sm"
+                        onClick={() => this.handleDelete()}
+                        style={{ marginTop: 5, boxShadow: '0 10px 20px -8px rgba(0, 0, 0,.7)' }}>Delete Employee</button><br />
 
-            <Popup trigger={<button style={{boxShadow:'0 10px 20px -8px rgba(0, 0, 0,.7)',marginTop:5}} 
-            className="btn btn-info btn-sm"> Post a Tweet </button>} modal>
-                <Tweet />
-            </Popup><br/>
-            
+                    <Popup trigger={<button style={{ boxShadow: '0 10px 20px -8px rgba(0, 0, 0,.7)', marginTop: 5 }}
+                        className="btn btn-info btn-sm"> Post a Tweet </button>} modal>
+                        <Tweet />
+                    </Popup><br />
+                    <button className="btn btn-info btn-sm" style={{ marginTop: 5, boxShadow: '0 10px 20px -8px rgba(0, 0, 0,.7)' }} onClick={this.handleLogOut}>Log out</button>
+                </div>
+
+                <ul className="nav nav-tabs" id="myTab" role="tablist">
+                    <li className="nav-item">
+                        <a className="nav-link active" id="home-tab" data-toggle="tab" href="#employeeTable" role="tab"
+                            aria-controls="employeeTable" aria-selected="true">EmployeeTable</a>
+                    </li>
+                    <li className="nav-item">
+                        <a className="nav-link" id="profile-tab" data-toggle="tab" href="#vacationTable" role="tab"
+                            aria-controls="vacationTable" aria-selected="false">VacationTable</a>
+                    </li>
+                </ul>
+                <div className="tab-content" id="myTabContent">
+                <div style={{ textAlign: 'center' }} className="tab-pane fade show active" id="employeeTable" role="tabpanel"
+                                 aria-labelledby="employeeTable-tab">
+                    <Table className={classes.table}>
+                        <TableHead>
+                            <TableRow>
+                                {this.state.delete ?
+                                    <TableCell>
+                                    </TableCell>
+                                    : null}
+                                <TableCell>Employee Name</TableCell>
+                                <TableCell numeric>Employee ID</TableCell>
+                                <TableCell >Hired Date</TableCell>
+                                <TableCell>Department</TableCell>
+                                <TableCell numeric>Salary</TableCell>
+                                <TableCell>Email</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {this.state.info.map(row => {
+                                return (
+                                    <TableRow key={row.userID}>
+
+                                        {this.state.delete ?
+                                            <TableCell>
+                                                <button type="button" className="btn btn-danger btn-sm" onClick={() => this.deleteUser(row.userID)}> delete </button>
+                                            </TableCell>
+                                            : null}
+                                        <TableCell component="th" scope="row">
+                                            {row.name}
+                                        </TableCell>
+                                        <TableCell numeric>{row.userID}</TableCell>
+                                        <TableCell >{row.hireDate}</TableCell>
+                                        <TableCell >{row.department}</TableCell>
+                                        <TableCell numeric>{row.salary}</TableCell>
+                                        <TableCell>{row.email}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </div>
+
+                    <div className="tab-pane fade" id="vacationTable" role="tabpanel"
+                        aria-labelledby="vacationTable-tab">
+                        <Table className={classes.table}>
+                            <TableHead>
+                                <TableRow>
+                                <TableCell>Posts ID</TableCell>
+                                <TableCell>Employee ID</TableCell>
+                                <TableCell>StartDate</TableCell>
+                                <TableCell>EndDate</TableCell>
+                                <TableCell>Status</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                            </TableBody>
+                        </Table>
+                    </div>
+                </div>
             </div>
-            <div style={{textAlign:'center'}}>
-            <Table className={classes.table}>
-              <TableHead>
-                <TableRow>
-                    {this.state.delete ?  
-                    <TableCell>
-                    </TableCell>
-                 : null}
-                  <TableCell>Employee Name</TableCell>
-                  <TableCell numeric>Employee ID</TableCell>
-                  <TableCell >Hired Date</TableCell>
-                  <TableCell>Department</TableCell>
-                  <TableCell numeric>Salary</TableCell>
-                  <TableCell>Email</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {this.state.info.map(row => {
-                  return (
-                    <TableRow key={row.userID}>
-                    
-                    {this.state.delete ? 
-                    <TableCell> 
-                        <button type="button" className="btn btn-danger btn-sm" onClick={()=>this.deleteUser(row.userID)}> delete </button>
-                    </TableCell>
-                    : null}  
-                      <TableCell component="th" scope="row">
-                        {row.name}
-                      </TableCell>
-                      <TableCell numeric>{row.userID}</TableCell>
-                      <TableCell >{row.hireDate}</TableCell>
-                      <TableCell >{row.department}</TableCell>
-                      <TableCell numeric>{row.salary}</TableCell>
-                      <TableCell>{row.email}</TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-            </div>
-        </div>
         );
     }
 }
 
 AdminTable.propTypes = {
     classes: PropTypes.object.isRequired,
-  };
-  
-  export default withStyles(styles)(AdminTable)
+};
+
+export default withStyles(styles)(AdminTable)

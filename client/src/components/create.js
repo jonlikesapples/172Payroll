@@ -11,7 +11,8 @@ class Create extends Component {
             email:'',
             hireDate:'',
             department:'',
-            message:''
+            message:'',
+            password:''
         }
         this.submitLogin = this.submitLogin.bind(this)
         //this.Auth = new Authserver();
@@ -32,7 +33,7 @@ class Create extends Component {
         hireDate : this.state.hireDate,
         department : this.state.department,
         admin:0,
-        password:'password'
+        password:this.state.password
         }
         axios.post(`/api/create`,{info})
             .then(res=>{   
@@ -70,7 +71,8 @@ render(){
                 :
                 null
             }
-            <div style={{ border: "1px solid #c2c2c2", textAlign: "center" }}>
+            <div style={{ border: "1px solid #c2c2c2",textAlign:"center"}}>
+            <div>
                 <form onSubmit={this.submitLogin}>
             <h2>Add Employee info</h2>
             <div className="form_element">
@@ -122,9 +124,20 @@ render(){
                     value={this.state.hireDate}
                     onChange={this.onChange}
                 />
+                </div>
+                <div>
+            Password: 
+            <input 
+                    type="text"
+                    name='password'
+                    placeholder="password"
+                    value={this.state.password}
+                    onChange={this.onChange}
+                />
             </div>
             <button type="submit" className="btn btn-info btn-sm">Add</button>
             </form>
+            </div>
             </div>
             </div>
     );

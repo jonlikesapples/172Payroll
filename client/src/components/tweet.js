@@ -7,6 +7,7 @@ class Tweet extends Component {
         this.state = {
             text:''
         }
+        this.handleOnClick = this.handleOnClick.bind(this)
     }
 
 
@@ -19,11 +20,28 @@ class Tweet extends Component {
         axios.post('/api/twitter',{text})
         .then(res => {
             console.log(res.data)
-        })
+            if(res.data === 200){
+                this.setState({success:'successfully tweet it'})
+            }else{
+                this.setState({error:"not able to tweet it"})
+            }
+            })
     }
     render() {
         return (
-            <div className="container" style={{textAlign:"center"}}>
+            <div className="container" style={{ textAlign: "center" }}>
+                {this.state.success ?
+                    <div className="alert alert-success" role="alert">
+                        {this.state.success}
+                    </div>
+                    : null}
+                {this.state.error ?
+                    <div className="alert alert-danger" role="alert">
+                        {this.state.error}
+                    </div>
+                    :
+                    null
+                }
                 <div>
                     Enter what you want to tweet:<br/>
                 <textarea

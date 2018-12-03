@@ -108,16 +108,26 @@ def create():
 				"admin" : int(admin)
 			})
 
+@app.route('/api/getTable', methods=['GET'])
+def getWholeTable():
+		info=[]
+		response = table.scan()
+		item = response["Items"]
+		# for i in response['Items']:
+		# 	info.append(json.dumps(i, cls=DecimalEncoder))
+		dumpedItem = json.loads(json.dumps(item, default=decimal_default));
+		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem })
+
 def getTable():
 		response = table.scan()
 		item = response["Items"]
 		dumpedItem = json.loads(json.dumps(item, default=decimal_default));
-		return dumpedItem;
+		return dumpedItem
 
 @app.route('/api/login',methods=['POST'])
 def login():
 
-	loadMe = json.dumps(request.form)
+	loadMe = json.dumps(request.get_json(silent=True)["user"])
 	payInfo = json.loads(loadMe)
 	try:
 
