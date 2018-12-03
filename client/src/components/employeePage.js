@@ -10,6 +10,7 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
+import Axios from 'axios';
 
 const styles = theme => ({
     root: {
@@ -28,12 +29,13 @@ class EmployeePage extends Component {
     constructor() {
         super()
         this.state = {
-            name: "TestBoy",
-            userID: "cd54b4ddb7813d2d95813fa99e35950a53bf100d8ef87f224637c011f5bf37b8",
-            department: "testing",
-            email: "testing@test.com",
-            salary: 100000000,
-            hiredate: "11/1/2018"
+            name: "",
+            userID: "",
+            department: "",
+            email: "",
+            salary: '',
+            hiredate: "",
+            timeoff:[]
         }
         this.Auth = new Authserver()
         this.handleLogOut = this.handleLogOut.bind(this)
@@ -44,7 +46,13 @@ class EmployeePage extends Component {
             this.props.history.push('/')
         }
         else{
+        const userID = this.props.location.state.info.userID
         this.setState(this.props.location.state.info)
+        Axios.get('/api/oneUserTimeOff',{params:{userID}})
+            .then(res=>{
+                console.log(res.data)
+                this.setState({timeoff:res.data.value})
+            })
         }
     }
 
@@ -116,14 +124,28 @@ class EmployeePage extends Component {
                         <Table className={classes.table}>
                             <TableHead>
                                 <TableRow>
-                                <TableCell>Posts ID</TableCell>
                                 <TableCell>Employee ID</TableCell>
                                 <TableCell>StartDate</TableCell>
                                 <TableCell>EndDate</TableCell>
-                                <TableCell>Status</TableCell>
+                                <TableCell>tiemStatus</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
+                            {this.state.timeoff.map(row => {
+                                return (
+                                    <TableRow key={row.timeoffID}>
+                                        <TableCell component="th" scope="row">{row.userID}</TableCell>
+                                        <TableCell >{row.startDate}</TableCell>
+                                        <TableCell >{row.endDate}</TableCell>
+                                        <TableCell>{row.tiemStatus == 2 ? 
+                                            <h5>Pending</h5>
+                                            : null}
+                                                    {row.tiemStatus == 1 ? <h5>Accept</h5>: null}
+                                                    {row.tiemStatus == 0 ? <h5>Decline</h5>: null}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
                             </TableBody>
                         </Table>
                 </div>
