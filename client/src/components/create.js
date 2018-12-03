@@ -70,7 +70,8 @@ render(){
                 :
                 null
             }
-            <div style={{ border: "1px solid #c2c2c2", textAlign: "center" }}>
+            <div style={{ border: "1px solid #c2c2c2",textAlign:"center"}}>
+            <div>
                 <form onSubmit={this.submitLogin}>
             <h2>Add Employee info</h2>
             <div className="form_element">
@@ -122,9 +123,20 @@ render(){
                     value={this.state.hireDate}
                     onChange={this.onChange}
                 />
+                </div>
+                <div>
+            Password: 
+            <input 
+                    type="text"
+                    name='password'
+                    placeholder="password"
+                    value={this.state.hireDate}
+                    onChange={this.onChange}
+                />
             </div>
             <button type="submit" className="btn btn-info btn-sm">Add</button>
             </form>
+            </div>
             </div>
             </div>
     );
