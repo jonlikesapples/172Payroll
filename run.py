@@ -45,36 +45,6 @@ def decimal_default(obj):
 def hello_world():
 	return "hello world"
 
-@app.route('/cognito/signup')
-def cognito_signup():
-	email = "sdads@gmail.com"
-	password = "Password1"
-	u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
-				secret_key=os.environ["AWS_SECRET_KEY"]);
-
-	u.add_base_attributes(email=email, name="jon");
-	res = u.register(email, password);
-	return response_with(responses.SUCCESS_200, value=res)
-
-@app.route('/cognito/login')
-def cognito_login():
-	try:
-		email = "jonlikesapples@gmail.com"
-		password = "Password1"
-		u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
-					secret_key=os.environ["AWS_SECRET_KEY"], username=email);
-		u.authenticate(password=password);
-		userResponse = {
-				"username" : u.username,
-				"id_token" : u.id_token,
-				"access_token" : u.access_token,
-				"refresh_token" : u.refresh_token,
-				"token_type" : u.token_type
-		}
-		return response_with(responses.SUCCESS_200, value=userResponse)
-	except Exception as e:
-		return response_with(responses.UNAUTHORIZED_403, value={"value" : e.args})
-
 @app.route('/cognito/logout', methods=['POST'])
 def cognito_logout():
 	try:
@@ -99,6 +69,14 @@ def create():
 		loadMe = json.dumps(request.form)
 		payInfo = json.loads(loadMe)
 		admin = payInfo["admin"]
+
+		u = Cognito(pool_id, client_id, user_pool_region="us-east-2", access_key=os.environ["AWS_ACCESS_KEY"],
+				secret_key=os.environ["AWS_SECRET_KEY"]);
+		u.add_base_attributes(email=payInfo["email"], name="name");
+		#email has to be proper email format
+		#password needs to have uppercase, lowercase, and a number
+		res = u.register(payInfo["email"], payInfo["password"]);
+
 		try:
 			uuid = generate_uuid(payInfo);
 			response = table.put_item(
@@ -121,15 +99,11 @@ def create():
 				"admin" : int(admin)
 			})
 
-@app.route('/api/getTable', methods=['GET'])
 def getTable():
-		info=[]
 		response = table.scan()
 		item = response["Items"]
-		# for i in response['Items']:
-		# 	info.append(json.dumps(i, cls=DecimalEncoder))
 		dumpedItem = json.loads(json.dumps(item, default=decimal_default));
-		return response_with(responses.SUCCESS_200, value={"value" : dumpedItem })
+		return dumpedItem;
 
 @app.route('/api/login',methods=['POST'])
 def login():
@@ -143,11 +117,17 @@ def login():
 			}
 		)
 		item = response['Item'];
-		dumpedItem = json.loads(json.dumps(item, default=decimal_default));
+		# return jsonify(item);
+		convertedItem = json.loads(json.dumps(item, default=decimal_default));
+		adminStatus = convertedItem['admin'];
+		wholeTable = getTable();
+		if (adminStatus == 1):
+			return response_with(responses.SUCCESS_200, value={"value" : wholeTable}, message={"admin" : adminStatus});
+		elif (adminStatus == 0): #just a reg employee
+			return response_with(responses.SUCCESS_200, value={"value": convertedItem}, message={"admin" : adminStatus}); #returns just user
+
 	except Exception as e:
 		return response_with(responses.UNAUTHORIZED_401, value={"value" : str(e)})
-	else:
-		return response_with(responses.SUCCESS_200, value={"value": dumpedItem});
 
 if __name__ == '__main__':
 	app.debug = True
