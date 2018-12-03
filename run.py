@@ -14,7 +14,7 @@ import socket
 import uuid
 from keys import Keys
 from TwitterAPI import TwitterAPI
-
+##
 app = Flask(__name__)
 
 session = Session(
@@ -197,7 +197,7 @@ def admin_get_requests():
 	# return json(response["Items"])
 	return response_with(responses.SUCCESS_200, value={"value":convertedItem})
 
-@app.route('/api/acceptrequest', methods=['POST'])
+@app.route('/api/acceptrequest', methods=['POST'])#
 def accept_request():
 	timeoffInfo = json.loads(json.dumps(request.form))
 	try:
