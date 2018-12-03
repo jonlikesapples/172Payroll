@@ -116,9 +116,15 @@ def getTable():
 
 @app.route('/api/login',methods=['POST'])
 def login():
+
 	loadMe = json.dumps(request.form)
 	payInfo = json.loads(loadMe)
 	try:
+
+		u = Cognito(pool_id, client_id, user_pool_region='us-east-2',
+                    access_key=os.environ["AWS_ACCESS_KEY"], secret_key=os.environ['AWS_SECRET_KEY'],
+                    username=payInfo["email"]);
+		u.authenticate(password=payInfo["password"]);
 		uuid = generate_uuid(payInfo)
 		response = table.get_item(
 			Key={
